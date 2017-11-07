@@ -167,4 +167,4 @@ w00t! We can make an iCalendar file!
 
 _If you look at the result of that calendar, it looks different from the handcoded one. Does it matter? It probably doesn't - but it shows a problem with the format - there are multiple ways of doing the same thing!_
 
-[Back](README)
+[Back](/)

@@ -38,4 +38,4 @@ In the simple rota case we don't get told who is on the rota - the only way to w
 
 Once we detect the abnormality we can adjust our code to cope with it. (Of course that hides a multitude of complexity.)
 
-[Back](../README)
+[Back](../)

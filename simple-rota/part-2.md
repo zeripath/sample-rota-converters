@@ -165,4 +165,4 @@ for name in name_to_list_of_rows_dict:
 
 So now we can complete the updated [simple_rota2.py](simple_rota2.py)
 
-[Back](../README)
+[Back](../)
