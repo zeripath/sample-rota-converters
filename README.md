@@ -1,5 +1,7 @@
 # Converting rotas into iCalendar files
 
+Main Documentation link: [https://zeripath.github.io/sample-rota-converters]
+
 ## Rationale
 Doctors in the UK often rotate jobs multiple times a year, and with each job comes a new rota.
 A new rota in a new format, often complex, almost always written as an excel spreadsheet, and
