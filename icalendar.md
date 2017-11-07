@@ -90,7 +90,7 @@ Now there are number of gotchas with this format, and most calendar applications
 
 * Here's an example: The maximum length of a line 72 characters - but you can represent lines longer than this by indenting on the next line.
 
-In any case we don't need to hand code these because someone else has done this work for us: The icalendar module [https://icalendar.readthedocs.io/en/latest/]
+In any case we don't need to hand code these because someone else has done this work for us: The icalendar module <https://icalendar.readthedocs.io/en/latest/>
 
 ```python
 # OK let's ensure that you have the necessary software

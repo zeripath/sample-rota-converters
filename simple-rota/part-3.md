@@ -10,7 +10,7 @@ There's no point creating these icalendar files if we can't get them into our ap
 
 We could post out the .ics files to everyone who wants them and then they import them directly into their calendar applications. A better plan would be to place the .ics files on a webserver somewhere, point our applications to that and then update the .ics files as needed.
 
-A good place to put these would be on your own webserver - but you may not have one. Another good, free place is on http://github.io
+A good place to put these would be on your own webserver - but you may not have one. Another good, free place is on <http://github.io>
 
 ## Date format
 

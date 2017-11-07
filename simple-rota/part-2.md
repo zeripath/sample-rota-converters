@@ -126,7 +126,7 @@ Now that's a little ugly, can we do better?
 
 What are we actually after is: [a dictionary where the default value is a list](https://www.google.co.uk/search?q=a%20dictionary%20where%20the%20default%20value%20is%20a%20list).
 
-The first link on Google for that is https://stackoverflow.com/questions/17755996/python-list-as-default-value-for-dictionary
+The first link on Google for that is <https://stackoverflow.com/questions/17755996/python-list-as-default-value-for-dictionary>
 
 What it suggests is to use `collections.defaultdict`. Let's try that.
 
