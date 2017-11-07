@@ -1,4 +1,4 @@
-# sample-rota-readers
+# Converting rotas into iCalendar files
 
 ## Rationale
 Doctors in the UK often rotate jobs multiple times a year, and with each job comes a new rota.
@@ -22,7 +22,7 @@ We can do better.
 
 Our calendar applications have a standard format for events, called the `iCalendar` format - standard suffix `.ics`
 
-This is defined at https://icalendar.org, wikipedia has a good description of it https://en.wikipedia.org/wiki/ICalendar.
+This is defined at [https://icalendar.org], wikipedia has a good description of it [https://en.wikipedia.org/wiki/ICalendar].
 
 If we can convert our rotas to `.ics` files we can either import them into our calendar applications, or, even better, stick on a website and point our applications to.
 

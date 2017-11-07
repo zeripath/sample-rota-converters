@@ -37,3 +37,5 @@ We can't predict what the rota co-ordinator is going to do, but what we should d
 In the simple rota case we don't get told who is on the rota - the only way to work out who is on the rota is to look at it and parse it. That makes catching unusual behaviour a bit difficult, but we do have one way to catch it: Look at the last time we parsed the rota and complain if there are new "people" on the rota.
 
 Once we detect the abnormality we can adjust our code to cope with it. (Of course that hides a multitude of complexity.)
+
+[Back](../README)

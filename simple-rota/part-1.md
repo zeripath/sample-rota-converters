@@ -48,7 +48,7 @@ We can just use `DictReader` for this.
 ### 3. Create events for each day
 Ah this is the interesting question!
 
-Let's recall the event code above:
+Let's recall the event code from the [introduction to icalendar](../icalendar):
 
 ```python
 # Create a lecture event
@@ -162,3 +162,5 @@ with open(output_filename, 'wb') as f:
 ```
 
 So now we've got all the components necessary to build a simple rota reader and I've put them all together in [simple_rota1.py](simple_rota1.py)
+
+[Back](../README)
