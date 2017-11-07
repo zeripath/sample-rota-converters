@@ -1,4 +1,7 @@
 # A simple rota
+
+[HOME](https://zeripath.github.io/sample-rota-converters)
+
 OK, so we now know what we want to convert our rota into and have a basic idea of how to go about making an icalendar. So let's look at a simple csv rota.
 
 ```csv
