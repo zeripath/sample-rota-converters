@@ -166,4 +166,4 @@ with open(output_filename, 'wb') as f:
 
 So now we've got all the components necessary to build a simple rota reader and I've put them all together in [simple_rota1.py](simple_rota1.py)
 
-[Back](../README)
+[Back](../)
