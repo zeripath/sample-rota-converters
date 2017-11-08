@@ -12,6 +12,10 @@ We could post out the .ics files to everyone who wants them and then they import
 
 A good place to put these would be on your own webserver - but you may not have one. Another good, free place is on <http://github.io>
 
+## Excel
+
+Almost all rotas come as Excel files. Switching from reading excel files to csv files isn't a completely simple switch. There are two modules I know of that can read excel: `pandas` and `xlrd` but they both have different APIs to that of `csv`.
+
 ## Date format
 
 It's highly likely that your rota co-ordinator is not using a program to generate your rota, and that they're simply adjusting it by hand.
@@ -36,7 +40,7 @@ We can't predict what the rota co-ordinator is going to do, but what we should d
 
 ### Detecting unusual behaviour
 
-In the simple rota case we don't get told who is on the rota - the only way to work out who is on the rota is to look at it and parse it. That makes catching unusual behaviour a bit difficult, but we do have one way to catch it: Look at the last time we parsed the rota and complain if there are new "people" on the rota.
+In the simple rota case we don't get told who is on the rota - the only way to work out who is on the rota is to look at it and parse it. That makes catching unusual behaviour a bit difficult, but we do have one way to catch it: Look at the last time we parsed the rota and complain if there are new "people" on the rota. Another option might be to detect the participants with very few on-calls and see if we can match them with others on the rota.
 
 Once we detect the abnormality we can adjust our code to cope with it. (Of course that hides a multitude of complexity.)
 
