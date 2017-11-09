@@ -1,3 +1,4 @@
+
 # Simple Rota Reader 3 - Problems and Hosting
 
 [HOME](https://zeripath.github.io/sample-rota-converters)
@@ -16,6 +17,59 @@ A good place to put these would be on your own webserver - but you may not have 
 
 Almost all rotas come as Excel files. Switching from reading excel files to csv files isn't a completely simple switch. There are two modules I know of that can read excel: `pandas` and `xlrd` but they both have different APIs to that of `csv`.
 
+We'll use `xlrd` as it is the most simple. The basic reading code is as follows:
+
+
+```python
+try:
+    import xlrd
+except ModuleNotFoundError:
+    !pip install --user xlrd
+
+import xlrd
+
+with xlrd.open_workbook('simple_rota.xls') as xls:
+    sheet = xls.sheet_by_index(0)
+    print('"%s", "%s"' % (sheet.cell_value(0, 0), sheet.cell_value(0, 1)))
+```
+
+    "Date", "On-Call"
+
+
+There are a few gotchas though with this, Excel stores dates and integers as floats. 
+
+
+```python
+import xlrd
+
+with xlrd.open_workbook('simple_rota.xls') as xls:
+    sheet = xls.sheet_by_index(0)
+    print('Cell value of (1, 0) is "%s"' % (sheet.cell_value(1, 0)))
+    date_tuple = xlrd.xldate_as_tuple(sheet.cell_value(1, 0), xls.datemode)
+    print('Which is actually: "%d/%02d/%02d %02d:%02d:%02d"' % date_tuple)
+```
+
+    Cell value of (1, 0) is "43101.0"
+    Which is actually: "2018/01/01 00:00:00"
+
+
+It would be ideal if there was a `DictReader` equivalent that did a sensible conversion for us... I've written a helper file for this: 
+[xlrd_helper.py](xlrd_helper.py)
+
+
+```python
+import xlrd_helper
+
+with open('simple_rota.xls', 'rb') as f:
+    rows = xlrd_helper.DictReader(f)
+    for row in rows:
+        print(row)
+        break
+```
+
+    OrderedDict([('Date', '2018/01/01'), ('On-Call', 'James')])
+
+
 ## Date format
 
 It's highly likely that your rota co-ordinator is not using a program to generate your rota, and that they're simply adjusting it by hand.
@@ -23,6 +77,8 @@ It's highly likely that your rota co-ordinator is not using a program to generat
 That means that they're likely to put dates in the file in various formats.
 
 We've already put a few fallbacks in - but we should probably put a few others in.
+
+One partial benefit of using Excel is that this becomes less of an issue as data in excel is typed. (Except of course when it isn't - you can input dates in to row and them not be automatically typed.)
 
 ## Name errors or other overloading of the names
 
