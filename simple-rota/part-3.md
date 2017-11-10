@@ -70,15 +70,45 @@ with open('simple_rota.xls', 'rb') as f:
     OrderedDict([('Date', '2018/01/01'), ('On-Call', 'James')])
 
 
+Note how the date is converted to `YYYY/MM/DD` format. Putting dates into year first format has a number of advantages, and I'd recommend this using year first formats rather that day first formats if you have any choice. (I'd recommend, however, you use `-` as separator or drop it altogether.)
+
+* 4-digit year first formats are umambiguous - Whereas 01-02-18 is interpretted as 1st of February 2018 in most of the world, it's 2nd January 2018 in the US, but could equally be 1918, or even 18th February 2001. 
+* Further, these formats can be lexicographically sorted - so if you have them in a filename - then files will get sorted by date!
+
 ## Date format
 
 It's highly likely that your rota co-ordinator is not using a program to generate your rota, and that they're simply adjusting it by hand.
 
 That means that they're likely to put dates in the file in various formats.
 
-We've already put a few fallbacks in - but we should probably put a few others in.
+One partial benefit of using Excel is that this becomes less of an issue as data in excel is typed. (Except of course when it isn't - you can input dates in to row and them not be automatically typed and this is why I've still converted the dates to a string.)
 
-One partial benefit of using Excel is that this becomes less of an issue as data in excel is typed. (Except of course when it isn't - you can input dates in to row and them not be automatically typed.)
+We've already put a few fallbacks in - and we could put a few others in - but there is another option: the `dateutil` module.
+
+
+```python
+try:
+    import dateutil
+except ModuleNotFoundError:
+    !pip install dateutil
+
+from dateutil.parser import parse
+
+print(parse('February 1 2018'))
+print(parse('1 feb 2018'))
+print(parse('1/2/2018', dayfirst=True))
+print(parse('01-02-18', dayfirst=True))
+print(parse('2018.02.01'))
+```
+
+    2018-02-01 00:00:00
+    2018-02-01 00:00:00
+    2018-02-01 00:00:00
+    2018-02-01 00:00:00
+    2018-02-01 00:00:00
+
+
+You see this fixes a number of problems, but note the use of `dayfirst`. As clever as this module is, it still cannot cope with the ambiguities of the 2 digit formats.
 
 ## Name errors or other overloading of the names
 
@@ -96,8 +126,30 @@ We can't predict what the rota co-ordinator is going to do, but what we should d
 
 ### Detecting unusual behaviour
 
-In the simple rota case we don't get told who is on the rota - the only way to work out who is on the rota is to look at it and parse it. That makes catching unusual behaviour a bit difficult, but we do have one way to catch it: Look at the last time we parsed the rota and complain if there are new "people" on the rota. Another option might be to detect the participants with very few on-calls and see if we can match them with others on the rota.
+In the simple rota case we don't get told who is on the rota - the only way to work out who is on the rota is to look at it and parse it. That makes catching unusual behaviour a bit difficult, but we do have one way to catch it: Look at the last time we parsed the rota and complain if there are new "people" on the rota.
 
-Once we detect the abnormality we can adjust our code to cope with it. (Of course that hides a multitude of complexity.)
+```python
+last_names = {}
+# Read the last names 
+if exists('last_names_simple.csv'):
+    with open('last_names_simple.csv') as f:
+        r = DictReader(f)
+        for row in r:
+            last_names[row['name']] = int(row['number'])
+
+with open('last_names_simple.csv', 'wb') as f:
+    w = DictWriter(f, ['name', 'number'])
+    w.writeheader()
+    for name in name_to_list_of_rows_dict:
+        number = len(name_to_list_of_rows_dict[name])
+        if not name in last_names:
+            # We have a new name
+            print('New name in rota: %s with %d rows', (name, number))
+        w.writerow( { 'name': name, 'number': number } )
+```
+
+Another option might be to detect the participants with very few on-calls and see if we can match them with others on the rota.
+
+Once we detect the abnormality we can adjust our code to cope with it or try to match the abnormal name with name on the rota. (Of course that hides a multitude of complexity.)
 
 [Back](../)

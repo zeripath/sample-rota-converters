@@ -1,19 +1,19 @@
-"""Functions to help make using an excel file easier"""
+"""Functions and Classes to help make using an excel file easier.
+
+
+This file provides two main classes: Reader and DictReader which are
+reimplementations of their csv counterparts
+"""
 import xlrd
 import mmap
 from collections import OrderedDict
 
-def cell_value_converter(sheet, i, j, *args):
-    """For a given sheet and co-ords return the cell's value"""
-    return sheet.cell_value(i, j)
+def cell_value_converter(cell):
+    """Returns the value of a given cell."""
+    return cell.value
 
-def cell_converter(sheet, i, j, *args):
-    """For a given sheet and co-ords return the cell"""
-    return sheet.cell(i, j)
-
-def auto_converter(sheet, i, j, book, date_format='%Y/%m/%d'):
-    """For a given sheet and co-ords return a sensible string representation of the value"""
-    cell = sheet.cell(i, j)
+def auto_converter(cell, book=None, date_format='%Y/%m/%d'):
+    """Converts a given cell to reasonable value using the provided date format for date cells."""
     if cell.ctype == 2:
         __v = cell.value
         return str(int(__v) if int(__v) == __v else __v)
@@ -30,6 +30,31 @@ def auto_converter(sheet, i, j, book, date_format='%Y/%m/%d'):
         return str(cell.value).strip()
 
 class Reader:
+    """ Provides a Reader object that will iterate over the rows in the given
+    *excelfile*.  An optional *sheet_index* parameter for the sheet_index can
+    be provided, as can a *converter* parameter to convert the cell to a useful
+    value. The other optional *args and **fmtparams can be given to pass values
+    to the converter.
+    
+    Each row from from the *excelfile* is returned as a list. The converter is
+    run on each, and is passed the cell, and named parameters: sheet, book, i,
+    and j in additional to the *args and **fmtparams.
+
+    A short usage example::
+
+    >>> import xlrd_helper
+    >>> with open('eggs.xls') as excelfile:
+    ...     spamreader = xlrd_helper.Reader(excelfile)
+    ...     for row in spamreader:
+    ...         print(', '.join(row))
+    Spam, Spam, Spam, Spam, Baked Beans
+    Spam, Lovely Spam, Wonderful Spam
+
+
+    If cell is required rather than just the value a *converter* of `lambda x : x`
+    will suffice.
+    """
+
     def __init__(self, f, sheet_index=0, converter=auto_converter, *args, **kwargs):
         self.f = f
         self.sheet_index = sheet_index
@@ -42,21 +67,42 @@ class Reader:
         self.kwargs = kwargs
 
     def __iter__(self):
-        return self
-        
-    def __next__(self):
-        if self.row_num < self.sheet.nrows:
-            row = [self.converter(self.sheet, self.row_num, j, self.book, *self.args, **self.kwargs) \
-                    for j in range(self.sheet.ncols)]
-            self.row_num += 1
-            return row
-        else:
-            raise StopIteration
+        for i, row in enumerate(self.sheet.get_rows()):
+            self.row_num = i
+            yield [ self.converter(cell,
+                book=self.book,
+                sheet=self.sheet,
+                i=i,
+                j=j,
+                *self.args,
+                **self.kwargs) for j, cell in enumerate(row) ]
 
-    def next(self):
-        return self.__next__()
+        raise StopIteration
+
 
 class DictReader:
+    """Creates an object that operates like a csv.DictReader but acting on an excel file.
+    The information in each row will be mapped to an :mod: `OrderedDict <collections.OrderedDict>`
+    whose keys are given by the optional *fieldnames* parameter.
+
+    The *fieldnames* parameter is a :term: `sequence`. If *fieldnames* is omitted, the
+    values in the first non-blank row of the excel sheet will be used as the fieldnames.
+
+    If a row has more fields than fieldnames, the remaining data is placed in a list and
+    stored with the fieldname specified by *restkey* (which defaults to ``None``). If a
+    non-blank row has fewer fields than fieldnames, the missing values are filled with *restval* (which defaults to ``None``).
+
+    All other optional or keyword arguments are passed to the underlying :class:`Reader` instance.
+
+    A short usage example::
+
+    >>> import xlrd_helper
+    >>> with open('names.xls') as excelfile:
+    ...     reader = xlrd_helper.DictReader(excelfile)
+    ...     for row in reader:
+    ...         print(row['first_name'], row['last_name'])
+    Eric Idle
+    John Cleese"""
     def __init__(self, f, fieldnames=None, restkey=None, restval=None, sheet_index=0, *args, **kwds):
         self._fieldnames = fieldnames
         self.restkey = restkey
