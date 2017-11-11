@@ -112,7 +112,7 @@ def check_last_names(name_to_list_of_rows_dict, directory):
             number = len(name_to_list_of_rows_dict[name])
             if not name in last_names:
                 # We have a new name
-                print('New name in rota: %s with %d rows', (name, number))
+                print('New name in rota: %s with %d rows' % (name, number))
             w.writerow( { 'name': name, 'number': number } )
             name_to_number_of_rows['name'] = number
     
@@ -128,7 +128,7 @@ def create_calendars(name_to_list_of_rows_dict, directory):
             f.write(cal.to_ical())
 
 ## Main function
-def parse_file_and_create_calendars(fname, sheet=0, directory):
+def parse_file_and_create_calendars(fname, sheet, directory):
     from os.path import exists
     name_to_list_of_rows_dict = defaultdict(list)
     read(fname, handle_rows, sheet, name_to_list_of_rows_dict)
