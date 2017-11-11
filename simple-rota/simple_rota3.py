@@ -23,7 +23,10 @@ DURATION = timedelta(hours=12)
 ## Conversion functions 
 def convert_to_date(date_str):
     """Convert a date string into a date using dateutil.parser.parse - assume dayfirst notation"""
-    return dateutil.parser.parse(date_str, dayfirst=True)
+    try:
+        return datetime.strptime(date_str, '%Y/%m/%d')
+    except ValueError:
+        return dateutil.parser.parse(date_str, dayfirst=True)
 
 ## Calendar functions
 def create_event_for(row):

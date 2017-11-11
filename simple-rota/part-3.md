@@ -135,17 +135,18 @@ print(parse('February 1 2018', dayfirst=True))
 print(parse('1 feb 2018', dayfirst=True))
 print(parse('1/2/2018', dayfirst=True))
 print(parse('01-02-18', dayfirst=True))
-print(parse('2018.02.01', dayfirst=True))
+print(parse('2018.02.01', dayfirst=True), 
+     parse('2018.02.01', dayfirst=True) == parse('01-02-18', dayfirst=True))
 ```
 
     2018-02-01 00:00:00
     2018-02-01 00:00:00
     2018-02-01 00:00:00
     2018-02-01 00:00:00
-    2018-01-02 00:00:00
+    2018-01-02 00:00:00 False
 
 
-You see this fixes a number of problems, but note the use of `dayfirst`. As clever as this module is, it still cannot cope with the ambiguities of the 2 digit formats.
+You see this fixes a number of problems, but note the use of `dayfirst`. As clever as this module is, it still cannot cope with the ambiguities of the 2 digit formats, and note that the last case fails!
 
 ## Name errors or other overloading of the names
 
