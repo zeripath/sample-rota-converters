@@ -8,11 +8,11 @@ import xlrd
 import mmap
 from collections import OrderedDict
 
-def cell_value_converter(cell):
+def cell_value_converter(cell, *args, **kwds):
     """Returns the value of a given cell."""
     return cell.value
 
-def auto_converter(cell, book=None, date_format='%Y/%m/%d'):
+def auto_converter(cell, book=None, date_format='%Y/%m/%d', *args, **kwds):
     """Converts a given cell to reasonable value using the provided date format for date cells."""
     if cell.ctype == 2:
         __v = cell.value
@@ -114,11 +114,6 @@ class DictReader:
 
     @property
     def fieldnames(self):
-        if self._fieldnames is None:
-            try:
-                self._fieldnames = next(self.reader)
-            except StopIteration:
-                pass
         self.row_num = self.reader.row_num
         return self._fieldnames
     
@@ -126,24 +121,20 @@ class DictReader:
     def fieldnames(self, value):
         self._fieldnames = value
         
-    def __next__(self):
-        if self.row_num == 0:
-            self.fieldnames
-        row = next(self.reader)
-        self.row_num = self.reader.row_num
-        
-        # We prefer not to return blanks
-        while row == []:
-            row = next(self.reader)
-        d = OrderedDict(zip(self.fieldnames, row))
-        len_fieldnames = len(self.fieldnames)
-        len_row = len(row)
-        if len_fieldnames < len_row:
-            d[self.restkey] = row[len_fieldnames:]
-        elif len_fieldnames > len_row:
-            for key in self.fieldnames[len_row:]:
-                d[key] = self.restval
-        return d
-
-    def next(self):
-        return self.__next__()
+    def __iter__(self):
+        for row in self.reader:
+            if row == []:
+                pass
+            self.row_num = self.reader.row_num
+            if self.fieldnames is None:
+                self._fieldnames = row
+            else:
+                d = OrderedDict(zip(self.fieldnames, row))
+                len_fieldnames = len(self.fieldnames)
+                len_row = len(row)
+                if len_fieldnames < len_row:
+                    d[self.restkey] = row[len_fieldnames:]
+                elif len_fieldnames > len_row:
+                    for key in self.fieldnames[len_row:]:
+                        d[key] = self.restval
+                yield d
