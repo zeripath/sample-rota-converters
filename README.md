@@ -29,8 +29,10 @@ This is defined at <https://icalendar.org>, wikipedia has a good description of 
 If we can convert our rotas to `.ics` files we can either import them into our calendar applications, or, even better, stick on a website and point our applications to.
 
 ## Plan
-1. [Introduce the icalendar format](icalendar)
-2. [Look at a very simple rota and write a simple converter](simple-rota/part-1)
-3. [Refine this converter](simple-rota/part-2)
-4. [Consider the problems of the converter](simple-rota/part-3)
-
+* [Introduce the icalendar format](icalendar)
+* Simple-Rota
+  1. [Look at a very simple rota and write a simple converter](simple-rota/part-1)
+  2. [Refine this converter](simple-rota/part-2)
+  3. [Consider the problems of the converter](simple-rota/part-3)
+* Multi-Rota
+  1. [Multiple shift - multiple person rotas](multi-rota/part-1)
