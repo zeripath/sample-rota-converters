@@ -51,10 +51,12 @@ If we look at [simple_rota3.py](../simple-rota/simple_rota3.py) we're going to n
 # simple_rota3.py
 def handle_rows(rows, name_to_list_of_rows_dict):
     """Store the rota information by name"""
+    name_to_list_of_rows_dict = defaultdict(list)
     for row in rows:
         name = row['On-Call']
         name_to_list_of_rows_dict[ name ].append(row)
         name_to_list_of_rows_dict[ 'All' ].append(row)
+    return name_to_list_of_rows_dict
 ```
 
 Now, there are mulitple ways of dealing with this, depending on how the rota co-ordinator works. If it's the case that the same name in the a different column is a different person then we'll need to store the job with the name - we should probably do that in any case - if an SpR acts down or SHO acts up it will probably be marked in some other way. 
@@ -64,12 +66,14 @@ Now, there are mulitple ways of dealing with this, depending on how the rota co-
 # multi_rota.py
 def handle_rows(rows, name_to_list_of_rows_dict):
     """Store the rota information by name and job"""
+    name_to_list_of_rows_dict = defaultdict(list)
     for row in rows:
         name_to_list_of_rows_dict[ ('All', 'All') ].append(row)
         for key in row:
             if key != 'Date':
                 name = row[key]
                 name_to_list_of_rows_dict[ (name, key) ].append(row)
+    return name_to_list_of_rows_dict
 ```
 
 We'll also have to adjust `create_event_for` and  `create_calendar_for` and pass in the name and job, change the summary and description to include more information, and adjust the hours based on the job.

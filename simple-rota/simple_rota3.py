@@ -66,31 +66,33 @@ def read_csv(fname, handler, sheet, *args, **kwds):
     from csv import DictReader
     with open(fname) as f:
         r = DictReader(f)
-        handler(r, *args, **kwds)
+        return handler(r, *args, **kwds)
 
 def read_excel(fname, handler, sheet=0, *args, **kwds):
     """Reads the given excel file *fname* as DictReader and calls handler with the first argument as the reader. Optional and named parameters are passed to the provided handler"""
     from xlrd_helper import DictReader
     with open(fname, 'rb') as f:
         r = DictReader(f, sheet_index=sheet)
-        handler(r, *args, **kwds)
+        return handler(r, *args, **kwds)
             
 def read(fname, handler, sheet=0, *args, **kwds):    
     """Attempt to read given file *fname* as a DictReader and calls handler with the first argument as the reader. Optional and named parameters are passed to the provided handler"""
     if fname.lower().endswith('.csv'):
-        read_csv(fname, handler, sheet, *args, **kwds) 
+        return read_csv(fname, handler, sheet, *args, **kwds) 
     elif fname.lower().endswith('.xls') or fname.lower().endswith('.xlsx'):
-        read_excel(fname, handler, sheet, *args, **kwds)
+        return read_excel(fname, handler, sheet, *args, **kwds)
     else:
         raise ValueError('Unknown filetype: %s' % fname)
 
 ## Reading functions
-def handle_rows(rows, name_to_list_of_rows_dict):
-    """Given some rows and a data structure to store the rota information in, parse the rows and store the rota information"""
+def handle_rows(rows):
+    """Given some rows, parse the rows and store the rota information"""
+    name_to_list_of_rows_dict = defaultdict(list)
     for row in rows:
         name = row['On-Call']
         name_to_list_of_rows_dict[ name ].append(row)
         name_to_list_of_rows_dict[ 'All' ].append(row)
+    return name_to_list_of_rows_dict
     
 
 ## Check last names functions
@@ -133,8 +135,7 @@ def create_calendars(name_to_list_of_rows_dict, directory):
 ## Main function
 def parse_file_and_create_calendars(fname, sheet, directory):
     from os.path import exists
-    name_to_list_of_rows_dict = defaultdict(list)
-    read(fname, handle_rows, sheet, name_to_list_of_rows_dict)
+    name_to_list_of_rows_dict = read(fname, handle_rows, sheet)
     
     if not exists(directory):
         from os import makedirs

@@ -71,8 +71,8 @@ def create_event_for(name, job, row):
     event = Event()
     
     # Description should say who else is in department.
-    description = '{1}: {0} with '.format(name, job)
-    others_d = ', '.join([ '{1}: {0}'.format(key, row[key]) \
+    description = '{0}: {1} with '.format(job, name)
+    others_d = ', '.join([ '{0}: {1}'.format(key, row[key]) \
                           for key in row \
                          if key not in ['Date', job]])
     event.add('description', description + others_d)
@@ -104,33 +104,35 @@ def read_csv(fname, handler, sheet, *args, **kwds):
     from csv import DictReader
     with open(fname) as f:
         r = DictReader(f)
-        handler(r, *args, **kwds)
+        return handler(r, *args, **kwds)
 
 def read_excel(fname, handler, sheet=0, *args, **kwds):
     """Reads the given excel file *fname* as DictReader and calls handler with the first argument as the reader. Optional and named parameters are passed to the provided handler"""
     from xlrd_helper import DictReader
     with open(fname, 'rb') as f:
         r = DictReader(f, sheet_index=sheet)
-        handler(r, *args, **kwds)
+        return handler(r, *args, **kwds)
             
 def read(fname, handler, sheet=0, *args, **kwds):    
     """Attempt to read given file *fname* as a DictReader and calls handler with the first argument as the reader. Optional and named parameters are passed to the provided handler"""
     if fname.lower().endswith('.csv'):
-        read_csv(fname, handler, sheet, *args, **kwds) 
+        return read_csv(fname, handler, sheet, *args, **kwds) 
     elif fname.lower().endswith('.xls') or fname.lower().endswith('.xlsx'):
-        read_excel(fname, handler, sheet, *args, **kwds)
+        return read_excel(fname, handler, sheet, *args, **kwds)
     else:
         raise ValueError('Unknown filetype: %s' % fname)
 
 ## Reading functions
-def handle_rows(rows, name_to_list_of_rows_dict):
+def handle_rows(rows):
     """Store the rota information by name and job"""
+    name_to_list_of_rows_dict = defaultdict(list)
     for row in rows:
         name_to_list_of_rows_dict[ ('All', 'All') ].append(row)
         for key in row:
             if key != 'Date':
                 name = row[key]
                 name_to_list_of_rows_dict[ (name, key) ].append(row)
+    return name_to_list_of_rows_dict
     
 
 ## Check last names functions
@@ -173,8 +175,7 @@ def create_calendars(name_to_list_of_rows_dict, directory):
 ## Main function
 def parse_file_and_create_calendars(fname, sheet, directory):
     from os.path import exists
-    name_to_list_of_rows_dict = defaultdict(list)
-    read(fname, handle_rows, sheet, name_to_list_of_rows_dict)
+    name_to_list_of_rows_dict = read(fname, handle_rows, sheet)
     
     if not exists(directory):
         from os import makedirs
