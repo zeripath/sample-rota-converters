@@ -37,3 +37,4 @@ If we can convert our rotas to `.ics` files we can either import them into our c
 * Multi-Rota
   1. [Multiple shift - multiple person rotas](multi-rota/part-1)
   2. [Adding night shifts to the multi-shift/multi-person rota](multi-rota/part-2)
+  3. [Name errors and other abuses](multi-rota/part-3)
