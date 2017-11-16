@@ -24,8 +24,7 @@ HOURS = {
         'start': time(8, tzinfo=TZ),
         'duration': timedelta(hours=12)
     },
-    'Consultant': {
-        'start': time(8, tzinfo=TZ),
+    'Consultant': {        
         'duration': timedelta(days=1)
     }
 }
@@ -70,23 +69,30 @@ def create_calendar_for(name, job, rows):
 def create_event_for(name, job, row):
     """Create an icalendar event for this row for name and job"""
     event = Event()
-    # Change the summary to say the job and the name.
-    event.add('summary', '{1}: {0}'.format(name, job))
+    
     # Description should say who else is in department.
-    # Now some calendars will basically need summary the same
-    # as description
     description = '{1}: {0} with '.format(name, job)
     others_d = ', '.join([ '{1}: {0}'.format(key, row[key]) \
                           for key in row \
                          if key not in ['Date', job]])
     event.add('description', description + others_d)
-    # This time look up the start time in the HOURS dictionary
-    event.add('dtstart', 
-              datetime.combine(
-                  convert_to_date(row['Date']),
-                  HOURS[job]['start']))
-    # Similarly look up the duration in the HOURS dictionary
+    
+    # Make the summary the same as the description
+    event.add('summary', description + others_d)
+    
+    if 'start' in HOURS[job]:
+        # If we have a start time in the HOURS dictionary for this job - combine it with date
+        event.add('dtstart', 
+                  datetime.combine(
+                      convert_to_date(row['Date']),
+                      HOURS[job]['start']))
+    else:
+        # Otherwise just use the date
+        event.add('dtstart', convert_to_date(row['Date']).date())
+
+    # Look up the duration in the HOURS dictionary
     event.add('duration', HOURS[job]['duration'])
+
     event.add('dtstamp', datetime.now())
     event.add('location', 'At work') # Set this to something useful
     event.add('uid', uuid.uuid4())
