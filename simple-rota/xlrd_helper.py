@@ -77,9 +77,6 @@ class Reader:
                 *self.args,
                 **self.kwargs) for j, cell in enumerate(row) ]
 
-        raise StopIteration
-
-
 class DictReader:
     """Creates an object that operates like a csv.DictReader but acting on an excel file.
     The information in each row will be mapped to an :mod: `OrderedDict <collections.OrderedDict>`
