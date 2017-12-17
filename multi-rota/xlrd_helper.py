@@ -35,7 +35,7 @@ class Reader:
     be provided, as can a *converter* parameter to convert the cell to a useful
     value. The other optional *args and **fmtparams can be given to pass values
     to the converter.
-    
+
     Each row from from the *excelfile* is returned as a list. The converter is
     run on each, and is passed the cell, and named parameters: sheet, book, i,
     and j in additional to the *args and **fmtparams.
@@ -60,7 +60,7 @@ class Reader:
         self.sheet_index = sheet_index
         self.converter = converter
         self.data = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
-        self.book = xlrd.open_workbook(file_contents=self.data)
+        self.book = xlrd.open_workbook(file_contents=self.data, *args, **kwargs)
         self.sheet = self.book.sheet_by_index(sheet_index)
         self.row_num = 0
         self.args = args
@@ -103,7 +103,7 @@ class DictReader:
     def __init__(self, f, fieldnames=None, restkey=None, restval=None, sheet_index=0, *args, **kwds):
         self._fieldnames = fieldnames
         self.restkey = restkey
-        self.reader = Reader(f, sheet_index, *args, **kwds) 
+        self.reader = Reader(f, sheet_index, *args, **kwds)
         self.row_num = self.reader.row_num
 
     def __iter__(self):
@@ -113,11 +113,11 @@ class DictReader:
     def fieldnames(self):
         self.row_num = self.reader.row_num
         return self._fieldnames
-    
+
     @fieldnames.setter
     def fieldnames(self, value):
         self._fieldnames = value
-        
+
     def __iter__(self):
         for row in self.reader:
             if row == []:
