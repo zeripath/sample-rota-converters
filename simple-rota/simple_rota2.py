@@ -57,7 +57,7 @@ def create_calendar_for(rows, title='Simple Rota'):
     cal.add('x-wr-calname', title)
 
     # Now open the rota
-    for row in reader:
+    for row in rows:
         event = create_event_for(row)
         cal.add_component(event)
         
@@ -76,6 +76,6 @@ with open('simple_rota.csv') as f:
 
 for name in name_to_list_of_rows_dict:
     rows = name_to_list_of_rows_dict[name]
-    cal = create_calendar_for(row, 'Simple Rota for %s' % name)
+    cal = create_calendar_for(rows, 'Simple Rota for %s' % name)
     with open('simple_rota_%s.ics' % name, 'wb') as f:
         f.write(cal.to_ical())
