@@ -1,23 +1,24 @@
 """A simple rota reader - generates a single icalendar file for the whole rota"""
 
-### IMPORTS
+# _________________________________ IMPORTS _________________________________
 from csv import DictReader
 from icalendar import Calendar, Event
 import uuid
-from datetime import date, datetime, time, timedelta
+from datetime import datetime, time, timedelta
 import pytz
 
-### CONSTANTS
+# ________________________________ CONSTANTS ________________________________
 
-# Define our local timezone - this is so that the rota works even when we cross into BST/GMT
+# Define our local timezone - this is so that the rota works even when we cross
+# into BST/GMT
 TZ = pytz.timezone('Europe/London')
 
 # Let's define the hours of work
 START_TIME = time(8, tzinfo=TZ)
 DURATION = timedelta(hours=12)
 
-### FUNCTIONS
 
+# ________________________________ FUNCTIONS ________________________________
 def convert_to_date(date_str):
     """Convert a date string into a date with a few fallbacks"""
     try:
@@ -28,23 +29,26 @@ def convert_to_date(date_str):
             # OK let's try with 2 digit year?
             return datetime.strptime(date_str, '%d/%m/%y').date()
         except ValueError:
-            # OK has it ended up in year first format - if this doesn't work we should fail
+            # OK has it ended up in year first format - if this doesn't work we
+            # should fail
             return datetime.strptime(date_str, '%Y/%m/%d').date()
+
 
 def create_event_for(row):
     """Take a row and create an icalendar event for this row"""
     event = Event()
     event.add('summary', 'On-Call: ' + row['On-Call'])
     event.add('description', 'On-Call: ' + row['On-Call'])
-    event.add('dtstart', datetime.combine(convert_to_date(row['Date']), START_TIME))
+    event.add('dtstart', datetime.combine(convert_to_date(row['Date']),
+                                          START_TIME))
     event.add('duration', DURATION)
     event.add('dtstamp', datetime.now())
-    event.add('location', 'At work') # Set this to something useful
+    event.add('location', 'At work')  # Set this to something useful
     event.add('uid', uuid.uuid4())
     return event
 
-### MAIN
 
+# ___________________________________ MAIN ___________________________________
 # Create a basic iCalendar object
 cal = Calendar()
 
@@ -61,6 +65,6 @@ with open('simple_rota.csv') as f:
     for row in reader:
         event = create_event_for(row)
         cal.add_component(event)
-        
+
 with open('simple_rota.ics', 'wb') as f:
     f.write(cal.to_ical())

@@ -8,12 +8,15 @@ import xlrd
 import mmap
 from collections import OrderedDict
 
+
 def cell_value_converter(cell, *args, **kwds):
     """Returns the value of a given cell."""
     return cell.value
 
+
 def auto_converter(cell, book=None, date_format='%Y/%m/%d', *args, **kwds):
-    """Converts a given cell to reasonable value using the provided date format for date cells."""
+    """Converts a given cell to reasonable value using the provided date format
+        for date cells."""
     if cell.ctype == 2:
         __v = cell.value
         return str(int(__v) if int(__v) == __v else __v)
@@ -28,6 +31,7 @@ def auto_converter(cell, book=None, date_format='%Y/%m/%d', *args, **kwds):
             return __d.isoformat()
     else:
         return str(cell.value).strip()
+
 
 class Reader:
     """ Provides a Reader object that will iterate over the rows in the given
@@ -51,16 +55,18 @@ class Reader:
     Spam, Lovely Spam, Wonderful Spam
 
 
-    If cell is required rather than just the value a *converter* of `lambda x : x`
-    will suffice.
-    """
+    If cell is required rather than just the value a *converter* of
+    `lambda x : x` will suffice."""
 
-    def __init__(self, f, sheet_index=0, converter=auto_converter, *args, **kwargs):
+    def __init__(self, f, sheet_index=0, converter=auto_converter, *args,
+                 **kwargs):
         self.f = f
         self.sheet_index = sheet_index
         self.converter = converter
         self.data = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
-        self.book = xlrd.open_workbook(file_contents=self.data, *args, **kwargs)
+        self.book = xlrd.open_workbook(file_contents=self.data,
+                                       *args,
+                                       **kwargs)
         self.sheet = self.book.sheet_by_index(sheet_index)
         self.row_num = 0
         self.args = args
@@ -69,45 +75,49 @@ class Reader:
     def __iter__(self):
         for i, row in enumerate(self.sheet.get_rows()):
             self.row_num = i
-            yield [ self.converter(cell,
-                book=self.book,
-                sheet=self.sheet,
-                i=i,
-                j=j,
-                *self.args,
-                **self.kwargs) for j, cell in enumerate(row) ]
+            yield [self.converter(cell,
+                                  book=self.book,
+                                  sheet=self.sheet,
+                                  i=i,
+                                  j=j,
+                                  *self.args,
+                                  **self.kwargs)
+                   for j, cell in enumerate(row)]
 
 class DictReader:
-    """Creates an object that operates like a csv.DictReader but acting on an excel file.
-    The information in each row will be mapped to an :mod: `OrderedDict <collections.OrderedDict>`
-    whose keys are given by the optional *fieldnames* parameter.
+    """Creates an object that operates like a csv.DictReader but acting on an
+        excel file. The information in each row will be mapped to an :mod:
+        `OrderedDict <collections.OrderedDict>` whose keys are given by the
+        optional *fieldnames* parameter.
 
-    The *fieldnames* parameter is a :term: `sequence`. If *fieldnames* is omitted, the
-    values in the first non-blank row of the excel sheet will be used as the fieldnames.
+        The *fieldnames* parameter is a :term: `sequence`. If *fieldnames* is
+        omitted, the values in the first non-blank row of the excel sheet will
+        be used as the fieldnames.
 
-    If a row has more fields than fieldnames, the remaining data is placed in a list and
-    stored with the fieldname specified by *restkey* (which defaults to ``None``). If a
-    non-blank row has fewer fields than fieldnames, the missing values are filled with *restval* (which defaults to ``None``).
+        If a row has more fields than fieldnames, the remaining data is placed
+        in a list and stored with the fieldname specified by *restkey* (which
+        defaults to ``None``). If a non-blank row has fewer fields than
+        fieldnames, the missing values are filled with *restval* (which
+        defaults to ``None``).
 
-    All other optional or keyword arguments are passed to the underlying :class:`Reader` instance.
+        All other optional or keyword arguments are passed to the underlying
+        :class:`Reader` instance.
 
-    A short usage example::
+        A short usage example::
 
-    >>> import xlrd_helper
-    >>> with open('names.xls') as excelfile:
-    ...     reader = xlrd_helper.DictReader(excelfile)
-    ...     for row in reader:
-    ...         print(row['first_name'], row['last_name'])
-    Eric Idle
-    John Cleese"""
-    def __init__(self, f, fieldnames=None, restkey=None, restval=None, sheet_index=0, *args, **kwds):
+        >>> import xlrd_helper
+        >>> with open('names.xls') as excelfile:
+        ...     reader = xlrd_helper.DictReader(excelfile)
+        ...     for row in reader:
+        ...         print(row['first_name'], row['last_name'])
+        Eric Idle
+        John Cleese"""
+    def __init__(self, f, fieldnames=None, restkey=None, restval=None,
+                 sheet_index=0, *args, **kwds):
         self._fieldnames = fieldnames
         self.restkey = restkey
         self.reader = Reader(f, sheet_index, *args, **kwds)
         self.row_num = self.reader.row_num
-
-    def __iter__(self):
-        return self
 
     @property
     def fieldnames(self):
